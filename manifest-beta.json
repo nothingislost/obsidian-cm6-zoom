@@ -1,0 +1,10 @@
+{
+	"id": "obsidian-cm6-zoom",
+	"name": "CM6 Zoom",
+	"version": "0.0.2",
+	"minAppVersion": "0.13.5",
+	"description": "This is an experimental zoom plugin for CM6. Use with caution as it is very alpha.",
+	"author": "NothingIsLost",
+	"authorUrl": "https://github.com/nothingislost",
+	"isDesktopOnly": false
+}
