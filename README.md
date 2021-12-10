@@ -16,7 +16,7 @@ When building CodeMirror 6 extensions, it is critical that you use the exact CM6
 
 The good news is that, as of version 0.13.8, Obsidian provides a way to ensure that you're always using the exact CM6 classes used by the editor. Obsidian does this by overloading calls to `require` for the "@codemirror" packages so that they can return the exact versions that they use internally.
 
-What this means, practically, is that you should mark all of your @codemirror dependencies as external in whatever bundler you are using. For esbuild, it would look like this:
+What this means, practically, is that you should mark all of your @codemirror dependencies as external in whatever bundler you are using. By marking these as external, you are telling the bundler to not include them in your plugin. For esbuild, it would look like this:
 
 ```js
     external: [
@@ -41,6 +41,8 @@ What this means, practically, is that you should mark all of your @codemirror de
     ]
 ```
 
+Note that the list above is the comprehensive list of @codemirror packages provided by Obsidian as of version 0.13.8. It is not advised to try and use any @codemirror package that is not in this list. If you attempt to import a @codemirror package not in this list, you run a high risk of introducing package conflicts and subtle bugs.
+
 With that done, you can now import packages like this `import { StateEffect, StateField, Transaction } from "@codemirror/state";` and be confident that your version of `StateField` will be the exact `StateField` used by Obsidian.
 
 ### Registering a CodeMirror 6 Extension
@@ -61,13 +63,13 @@ For cases where you want to get more advanced with your extension management, re
 
 Obsidian exposes two additional components which can be helpful during plugin development. These components are [StateFields](https://codemirror.net/6/docs/guide/#state-fields) that store a reference to the CM6 `EditorView` and the Obsidian `MarkdownView` in the CM6 `EditorState`.
 
-The two `StateField` can be imported from the 'obsidian' packaged and are name [editorEditorField](https://github.com/obsidianmd/obsidian-api/blob/master/obsidian.d.ts#L808) and [editorViewField](https://github.com/obsidianmd/obsidian-api/blob/master/obsidian.d.ts#L935).
+The two `StateField` components can be imported from the 'obsidian' package and are named [editorEditorField](https://github.com/obsidianmd/obsidian-api/blob/master/obsidian.d.ts#L808) and [editorViewField](https://github.com/obsidianmd/obsidian-api/blob/master/obsidian.d.ts#L935).
 
-These fields are useful for getting a reference to current editor's `EditorView` or `MarkdownView` from a `EditorState` event.
+These fields are useful for getting a reference to the current editor's `EditorView` or `MarkdownView` from a `EditorState` event.
 
 When you register a `StateField`, your `StateField` will start receiving state events from the editor. Since `EditorState` is completely isolated from the actual `EditorView` in CM6, these state events will provide no indication of what editor or view the event is associated to.
 
-For example, here is how one might use the `editorEditorField` `StateField` to clear a class from the associated `div.markdown-source-view` element whenever the EditorState has been created or reset:
+For example, here is how one might use the `editorEditorField` `StateField` to remove a class from the associated `div.markdown-source-view` element whenever the EditorState has been created or reset:
 
 ```js
     const zoomStateField = StateField.define<DecorationSet>({
